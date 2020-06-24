@@ -2,6 +2,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using fts;
+
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct Opt
 {
@@ -9,14 +11,18 @@ public unsafe struct Opt
     public int length;
 }
 
+[PluginAttr("relaxed_ik")]
 public static class RelaxedIK
 {
-    [DllImport("relaxed_ik")]
+    /*[DllImport("relaxed_ik")]
     private static extern Opt run_solver(double[] pos_arr, int pos_length, double[] quat_arr, int quat_length);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Opt RunSolver(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len)
     {
         return run_solver(pos_arr, pos_len, quat_arr, quat_len);
-    }
+    }*/
+    [PluginFunctionAttr("run_solver")]
+    public static RunSolver runSolver = null;
+    public delegate Opt RunSolver(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len);
 }

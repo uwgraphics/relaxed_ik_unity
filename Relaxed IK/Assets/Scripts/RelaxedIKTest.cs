@@ -4,13 +4,22 @@ using UnityEngine;
 
 public class RelaxedIKTest : MonoBehaviour
 {
-    // Start is called before the first frame update
-    private unsafe void Start()
-    {
-        double[] pos_test = new double[] { 0.015, 0.015, 0.015 };
-        double[] quat_test = new double[] { 0.0, 0.0, 0.0, 1.0 };
+    
+    public double[] pos_test = new double[] { 0.015, 0.015, 0.015 };
+    public double[] quat_test = new double[] { 0.0, 0.0, 0.0, 1.0 };
 
-        Opt xopt = RelaxedIK.RunSolver(pos_test, pos_test.Length, quat_test, quat_test.Length);
+    private Opt xopt;
+
+    // Start is called before the first frame update
+    private void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    private unsafe void Update()
+    {
+        xopt = RelaxedIK.runSolver(pos_test, pos_test.Length, quat_test, quat_test.Length);
         double[] ja = new double[xopt.length];
         string ja_str = "";
         for (int i = 0; i < xopt.length; i++)
@@ -26,11 +35,5 @@ public class RelaxedIKTest : MonoBehaviour
             }
         }
         Debug.Log(ja_str + "]");
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        
     }
 }
