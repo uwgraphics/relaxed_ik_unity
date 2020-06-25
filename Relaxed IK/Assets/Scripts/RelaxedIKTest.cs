@@ -19,7 +19,7 @@ public class RelaxedIKTest : MonoBehaviour
     // Update is called once per frame
     private unsafe void Update()
     {
-        xopt = RelaxedIK.runSolver(pos_test, pos_test.Length, quat_test, quat_test.Length);
+        xopt = RelaxedIK.runUnity(pos_test, pos_test.Length, quat_test, quat_test.Length);
         double[] ja = new double[xopt.length];
         string ja_str = "";
         for (int i = 0; i < xopt.length; i++)

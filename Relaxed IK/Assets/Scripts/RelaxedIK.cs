@@ -22,7 +22,8 @@ public static class RelaxedIK
     {
         return run_solver(pos_arr, pos_len, quat_arr, quat_len);
     }*/
-    [PluginFunctionAttr("run_solver")]
-    public static RunSolver runSolver = null;
-    public delegate Opt RunSolver(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len);
+
+    [PluginFunctionAttr("run_unity")]
+    public static RunUnity runUnity = null;
+    public delegate Opt RunUnity(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len);
 }
