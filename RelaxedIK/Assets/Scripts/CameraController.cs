@@ -31,22 +31,25 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        // Look around with Left Mouse
-        if (Input.GetMouseButton(0))
+        if (Input.GetKey(KeyCode.LeftAlt))
         {
-            yaw += lookSpeedH * Input.GetAxis("Mouse X");
-            pitch -= lookSpeedV * Input.GetAxis("Mouse Y");
+            // Look around with Left Mouse
+            if (Input.GetMouseButton(0))
+            {
+                yaw += lookSpeedH * Input.GetAxis("Mouse X");
+                pitch -= lookSpeedV * Input.GetAxis("Mouse Y");
 
-            transform.eulerAngles = new Vector3(pitch, yaw, 0f);
+                transform.eulerAngles = new Vector3(pitch, yaw, 0f);
+            }
+
+            // Drag camera around with Right Mouse
+            if (Input.GetMouseButton(1))
+            {
+                transform.Translate(-Input.GetAxis("Mouse X") * dragSpeed, -Input.GetAxis("Mouse Y") * dragSpeed, 0);
+            }
+
+            //Zoom in and out with Mouse Wheel
+            transform.Translate(0, 0, Input.GetAxis("Mouse ScrollWheel") * zoomSpeed);
         }
-
-        // Drag camera around with Right Mouse
-        if (Input.GetMouseButton(1))
-        {
-            transform.Translate(-Input.GetAxis("Mouse X") * dragSpeed, -Input.GetAxis("Mouse Y") * dragSpeed, 0);
-        }
-
-        //Zoom in and out with Mouse Wheel
-        transform.Translate(0, 0, Input.GetAxis("Mouse ScrollWheel") * zoomSpeed);
     }
 }
