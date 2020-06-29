@@ -42,11 +42,12 @@ namespace RosSharp.RosBridgeClient
 
         private unsafe void Update()
         {
-            gripperPos += gripper.localPosition;
-            gripperQuat *= gripper.localRotation;
-            Debug.Log(gripperPos);
-            Debug.Log(gripperQuat);
-            double[] posArr = new double[] { gripperPos.z, -gripperPos.y, gripperPos.x };
+            gripperPos += TransformUnityToRvizPos(gripper.localPosition);
+            gripperQuat *= TransformUnityToRvizRot(gripper.localRotation);
+            
+            // Debug.Log(gripperPos);
+            // Debug.Log(gripperQuat);
+            double[] posArr = new double[] { gripperPos.x, gripperPos.y, gripperPos.z };
             double[] quatArr = new double[] { gripperQuat.x, gripperQuat.y, gripperQuat.z, gripperQuat.w };
             
             xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
@@ -63,6 +64,17 @@ namespace RosSharp.RosBridgeClient
 
             gripper.localPosition = new Vector3(0, 0, 0);
             gripper.localRotation = new Quaternion(0, 0, 0, 1);
+        }
+
+        // Some hard code to transform the coordinate system
+        private Vector3 TransformUnityToRvizPos(Vector3 pos)
+        {
+            return new Vector3(pos.z, -pos.y, pos.x);
+        }
+
+        private Quaternion TransformUnityToRvizRot(Quaternion quat) 
+        {
+            return new Quaternion(quat.z, -quat.y, quat.x, quat.w);
         }
     }
 
