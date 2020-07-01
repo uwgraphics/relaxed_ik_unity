@@ -6,6 +6,7 @@ namespace RosSharp.RosBridgeClient
 {
     public class RelaxedIKUnity : MonoBehaviour
     {
+        public bool enableRelaxedIK;
         public List<GameObject> robotLinks;
         public Transform gripper;
         /*public double[] posTest = new double[] { 0.015, 0.015, 0.015 };
@@ -42,28 +43,31 @@ namespace RosSharp.RosBridgeClient
 
         private unsafe void Update()
         {
-            gripperPos += TransformUnityToRvizPos(gripper.localPosition);
-            gripperQuat *= TransformUnityToRvizRot(gripper.localRotation);
-            
-            // Debug.Log(gripperPos);
-            // Debug.Log(gripperQuat);
-            double[] posArr = new double[] { gripperPos.x, gripperPos.y, gripperPos.z };
-            double[] quatArr = new double[] { gripperQuat.x, gripperQuat.y, gripperQuat.z, gripperQuat.w };
-            
-            xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
-            
-            string jaStr = "";
-            for (int i = 0; i < xopt.length; i++)
+            if (enableRelaxedIK) 
             {
-                float angle = Mathf.Rad2Deg * (float) xopt.data[i];
-                Vector3 axis = angle * joints[i].axis;
-                robotLinks[i].transform.localEulerAngles = (baseRotations[i] * Quaternion.Euler(axis)).eulerAngles;
-                jaStr += i == 0 ? "[" + xopt.data[i].ToString() : ", " + xopt.data[i].ToString();    
-            }
-            Debug.Log(jaStr + "]");
+                gripperPos += TransformUnityToRvizPos(gripper.localPosition);
+                gripperQuat *= TransformUnityToRvizRot(gripper.localRotation);
+                
+                // Debug.Log(gripperPos);
+                // Debug.Log(gripperQuat);
+                double[] posArr = new double[] { gripperPos.x, gripperPos.y, gripperPos.z };
+                double[] quatArr = new double[] { gripperQuat.x, gripperQuat.y, gripperQuat.z, gripperQuat.w };
+                
+                xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
+                
+                string jaStr = "";
+                for (int i = 0; i < xopt.length; i++)
+                {
+                    float angle = Mathf.Rad2Deg * (float) xopt.data[i];
+                    Vector3 axis = angle * joints[i].axis;
+                    robotLinks[i].transform.localEulerAngles = (baseRotations[i] * Quaternion.Euler(axis)).eulerAngles;
+                    jaStr += i == 0 ? "[" + xopt.data[i].ToString() : ", " + xopt.data[i].ToString();    
+                }
+                Debug.Log(jaStr + "]");
 
-            gripper.localPosition = new Vector3(0, 0, 0);
-            gripper.localRotation = new Quaternion(0, 0, 0, 1);
+                gripper.localPosition = new Vector3(0, 0, 0);
+                gripper.localRotation = new Quaternion(0, 0, 0, 1);
+            }
         }
 
         // Some hard code to transform the coordinate system
