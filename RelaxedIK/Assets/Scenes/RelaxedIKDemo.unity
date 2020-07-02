@@ -2286,6 +2286,7 @@ GameObject:
   - component: {fileID: 402110050}
   - component: {fileID: 402110049}
   - component: {fileID: 402110051}
+  - component: {fileID: 402110052}
   m_Layer: 5
   m_Name: JointAnglePanel
   m_TagString: Untagged
@@ -2302,7 +2303,7 @@ RectTransform:
   m_GameObject: {fileID: 402110047}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.6, z: 1}
+  m_LocalScale: {x: 0.4, y: 0.7, z: 1}
   m_Children: []
   m_Father: {fileID: 80584407}
   m_RootOrder: 0
@@ -2374,6 +2375,23 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &402110052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402110047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6c8cb04d6e530845879ccd2168e11f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hGroupPrefab: {fileID: 1055693126764728454, guid: 2cf9c677b1031ef4e9bf17baa5030b9f,
+    type: 3}
+  textPrefab: {fileID: 117118, guid: 5f254271b254145adad88f901e3bc9dc, type: 3}
+  labelPrefab: {fileID: 117118, guid: 5f254271b254145adad88f901e3bc9dc, type: 3}
+  sliderPrefab: {fileID: 152160, guid: d2c67c9f8ecea45ad946dc423474b514, type: 3}
 --- !u!1 &436209152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2928,7 +2946,6 @@ GameObject:
   m_Component:
   - component: {fileID: 587743587}
   - component: {fileID: 587743586}
-  - component: {fileID: 587743588}
   m_Layer: 0
   m_Name: Script Manager
   m_TagString: Untagged
@@ -2962,25 +2979,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &587743588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 587743585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6c8cb04d6e530845879ccd2168e11f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panel: {fileID: 402110047}
-  hGroupPrefab: {fileID: 1055693126764728454, guid: 2cf9c677b1031ef4e9bf17baa5030b9f,
-    type: 3}
-  textPrefab: {fileID: 117118, guid: 5f254271b254145adad88f901e3bc9dc, type: 3}
-  sliderPrefab: {fileID: 152160, guid: d2c67c9f8ecea45ad946dc423474b514, type: 3}
-  maxJointVelocity: 200
-  sliders: []
 --- !u!1 &593999305
 GameObject:
   m_ObjectHideFlags: 0
@@ -3056,7 +3054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1056068d2603f54aa2ba4b3c5d05e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableRelaxedIK: 0
+  enableRelaxedIK: 1
   robotLinks:
   - {fileID: 575444464}
   - {fileID: 759734783}
@@ -7939,7 +7937,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1056068d2603f54aa2ba4b3c5d05e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableRelaxedIK: 0
+  enableRelaxedIK: 1
   robotLinks:
   - {fileID: 1315936523}
   - {fileID: 174205534}
