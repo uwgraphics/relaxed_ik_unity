@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 22456078}
   - component: {fileID: 11466182}
   - component: {fileID: 9573110}
-  - component: {fileID: -7483269430604922084}
+  - component: {fileID: 4510525753509185232}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -195,7 +195,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &-7483269430604922084
+--- !u!114 &4510525753509185232
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -208,10 +208,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 600
-  m_PreferredHeight: 40
+  m_MinWidth: 90
+  m_MinHeight: 10
+  m_PreferredWidth: 180
+  m_PreferredHeight: 20
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
