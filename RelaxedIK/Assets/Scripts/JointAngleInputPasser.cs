@@ -7,9 +7,10 @@ namespace RosSharp.RosBridgeClient
 {
     public class InputPasser
     {
+        public GameObject link;
+        public Quaternion baseRot;
         public Slider slider;
         public Text text;
-        public JointStateWriter writer;
         public bool updated;
     }
 
@@ -20,48 +21,46 @@ namespace RosSharp.RosBridgeClient
         public GameObject labelPrefab;
         public GameObject sliderPrefab;
         public GameObject buttonPrefab;
-        // public GameObject togglePrefab;
 
         private Transform contentPanel;
+        private GameObject enableRIKBtn;
         private List<InputPasser> passers;
+        private RelaxedIKUnity r;
         private bool randomized;
         private bool zeroed;
-        private RelaxedIKUnity r;
 
         // Start is called before the first frame update
         void Start()
         {
+            r = FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity;
             contentPanel =  transform.Find("Content");
+            passers = new List<InputPasser>();
 
-            GameObject enableRIKBtn = Instantiate(buttonPrefab, transform.Find("Toggle")) as GameObject;
+            enableRIKBtn = Instantiate(buttonPrefab, transform.Find("Toggle")) as GameObject;
             enableRIKBtn.name = "toggle_enable_RIK";
-            Text enableRIKBtnText = enableRIKBtn.GetComponentInChildren<Text>();
-            enableRIKBtnText.text = "Enable Relaxed IK";
+            if (r.enableRelaxedIK) {
+                EnableRIKListener();
+            } else {
+                DisableRIKListener();
+            }
             enableRIKBtn.GetComponent<Button>().onClick.AddListener(
                 delegate {
                     if (r.enableRelaxedIK) {
                         r.enableRelaxedIK = false;
-                        enableRIKBtnText.text = "Enable Relaxed IK";
-                        SetContentPanelActive();
-                        transform.Find("Header").Find("MinimizeButton").gameObject.SetActive(true);
-                        transform.Find("Header").Find("MaximizeButton").gameObject.SetActive(true);
+                        DisableRIKListener();
                     } else {
                         r.enableRelaxedIK = true;
-                        enableRIKBtnText.text = "Disable Relaxed IK";
-                        SetContentPanelInactive();
-                        transform.Find("Header").Find("MinimizeButton").gameObject.SetActive(false);
-                        transform.Find("Header").Find("MaximizeButton").gameObject.SetActive(false);
+                        EnableRIKListener();
                     }
                 }
             );
 
-            passers = new List<InputPasser>();
-
-            r = FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity;
             for (int i = 0; i < r.robotLinks.Count; i++)
             {
                 GameObject link = r.robotLinks[i];
                 InputPasser passer = new InputPasser();
+                passer.link = link;
+                passer.baseRot = link.transform.localRotation;
 
                 GameObject vGroup = Instantiate(vGroupPrefab, contentPanel.Find("Sliders")) as GameObject;
                 vGroup.name = "vertical_group_" + i;
@@ -87,8 +86,6 @@ namespace RosSharp.RosBridgeClient
                 passer.text = labelObj.GetComponent<Text>();
                 passer.text.text = passer.slider.value.ToString("0.0");
 
-                passer.writer = link.AddComponent(typeof(JointStateWriter)) as JointStateWriter;
-
                 passers.Add(passer);
             }
 
@@ -108,21 +105,22 @@ namespace RosSharp.RosBridgeClient
         // Update is called once per frame
         void Update()
         {
-            foreach (InputPasser passer in passers) 
+            string jaStr = "";
+            for (int i = 0; i < passers.Count; i++)
             {
-                if (passer.updated) {
-                    passer.text.text = passer.slider.value.ToString("0.0");
-                    passer.writer.Write(passer.slider.value);
-                    passer.updated = false;
+                if (passers[i].updated) {
+                    UpdateJointAngle(passers[i]);
+                    passers[i].updated = false;
                 }
+                jaStr += i == 0 ? "[" + passers[i].slider.value.ToString() : ", " + passers[i].slider.value.ToString();  
             }
+            Debug.Log("Joint Angle Writer: " + jaStr + "]");
 
             if (randomized) {
                 foreach (InputPasser passer in passers) 
                 {
                     passer.slider.value = Random.Range(passer.slider.minValue, passer.slider.maxValue); 
-                    passer.text.text = passer.slider.value.ToString("0.0");
-                    passer.writer.Write(passer.slider.value);
+                    UpdateJointAngle(passer);
                 }
                 randomized = false;
             }
@@ -131,14 +129,40 @@ namespace RosSharp.RosBridgeClient
                 foreach (InputPasser passer in passers) 
                 {
                     passer.slider.value = 0f; 
-                    passer.text.text = passer.slider.value.ToString("0.0");
-                    passer.writer.Write(passer.slider.value);
+                    UpdateJointAngle(passer);
                 }
                 zeroed = false;
             }
         }
 
-        public void SetContentPanelActive() {
+        private void UpdateJointAngle(InputPasser passer) {
+            passer.text.text = passer.slider.value.ToString("0.0");
+            float angle = Mathf.Rad2Deg * passer.slider.value;
+            Vector3 axis = angle * passer.link.GetComponent<Joint>().axis;
+            passer.link.transform.localEulerAngles = (passer.baseRot * Quaternion.Euler(axis)).eulerAngles;
+        }
+
+        private void EnableRIKListener() {
+            enableRIKBtn.GetComponentInChildren<Text>().text = "Disable Relaxed IK";
+            SetContentPanelInactive();
+            transform.Find("Header").Find("MinimizeButton").gameObject.SetActive(false);
+            transform.Find("Header").Find("MaximizeButton").gameObject.SetActive(false);
+        }
+
+        private void DisableRIKListener() {
+            enableRIKBtn.GetComponentInChildren<Text>().text = "Enable Relaxed IK";
+            SetContentPanelActive();
+            transform.Find("Header").Find("MinimizeButton").gameObject.SetActive(true);
+            transform.Find("Header").Find("MaximizeButton").gameObject.SetActive(true);
+        }
+
+        public unsafe void SetContentPanelActive() {
+            for (int i = 0; i < passers.Count; i++) 
+            {
+                passers[i].slider.value = (float) r.xopt.data[i];
+                passers[i].text.text = passers[i].slider.value.ToString("0.0");
+                passers[i].updated = false;
+            }
             contentPanel.gameObject.SetActive(true);
         }
 

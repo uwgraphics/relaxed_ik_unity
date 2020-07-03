@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RuntimeGizmos;
 
 namespace RosSharp.RosBridgeClient
 {
@@ -9,6 +10,7 @@ namespace RosSharp.RosBridgeClient
         public bool enableRelaxedIK;
         public List<GameObject> robotLinks;
         public Transform gripper;
+        public Opt xopt;
         /*public double[] posTest = new double[] { 0.015, 0.015, 0.015 };
         public double[] quatTest = new double[] { 0.0, 0.0, 0.0, 1.0 };*/
 
@@ -17,10 +19,10 @@ namespace RosSharp.RosBridgeClient
         private Vector3 gripperPos;
         private Quaternion gripperQuat;
         // private Transform root;
-        private Opt xopt;
+        private TransformGizmo gizmo;
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             joints = new List<Joint>();
             baseRotations = new List<Quaternion>();
@@ -38,13 +40,16 @@ namespace RosSharp.RosBridgeClient
                 // }
                 joints.Add(joint);
                 baseRotations.Add(link.transform.localRotation);
-            }            
+            }
+
+            gizmo = FindObjectOfType(typeof(TransformGizmo)) as TransformGizmo;
         }
 
         private unsafe void Update()
         {
             if (enableRelaxedIK) 
             {
+                gizmo.enabled = true;
                 gripperPos += TransformUnityToRvizPos(gripper.localPosition);
                 gripperQuat *= TransformUnityToRvizRot(gripper.localRotation);
                 
@@ -63,22 +68,26 @@ namespace RosSharp.RosBridgeClient
                     robotLinks[i].transform.localEulerAngles = (baseRotations[i] * Quaternion.Euler(axis)).eulerAngles;
                     jaStr += i == 0 ? "[" + xopt.data[i].ToString() : ", " + xopt.data[i].ToString();    
                 }
-                Debug.Log(jaStr + "]");
+                Debug.Log("Relaxed IK: " + jaStr + "]");
 
                 gripper.localPosition = new Vector3(0, 0, 0);
                 gripper.localRotation = new Quaternion(0, 0, 0, 1);
+            } else {
+                gizmo.enabled = false;
             }
         }
 
         // Some hard code to transform the coordinate system
         private Vector3 TransformUnityToRvizPos(Vector3 pos)
         {
-            return new Vector3(pos.z, -pos.y, pos.x);
+            // return new Vector3(pos.z, -pos.y, pos.x);
+            return new Vector3(pos.y, -pos.x, pos.z);
         }
 
         private Quaternion TransformUnityToRvizRot(Quaternion quat) 
         {
-            return new Quaternion(quat.z, -quat.y, quat.x, quat.w);
+            // return new Quaternion(quat.z, -quat.y, quat.x, quat.w);
+            return new Quaternion(quat.y, -quat.x, quat.z, quat.w);
         }
     }
 

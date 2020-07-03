@@ -3216,7 +3216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1056068d2603f54aa2ba4b3c5d05e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableRelaxedIK: 0
+  enableRelaxedIK: 1
   robotLinks:
   - {fileID: 575444464}
   - {fileID: 759734783}
@@ -8535,7 +8535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1056068d2603f54aa2ba4b3c5d05e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableRelaxedIK: 0
+  enableRelaxedIK: 1
   robotLinks:
   - {fileID: 1315936523}
   - {fileID: 174205534}
