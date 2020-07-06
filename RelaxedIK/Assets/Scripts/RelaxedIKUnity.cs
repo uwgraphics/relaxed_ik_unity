@@ -80,8 +80,12 @@ namespace RosSharp.RosBridgeClient
         // Some hard code to transform the coordinate system
         private Vector3 TransformUnityToRvizPos(Vector3 pos)
         {
+            // ur5
             // return new Vector3(pos.z, -pos.y, pos.x);
-            return new Vector3(pos.y, -pos.x, pos.z);
+            // iiwa7
+            // return new Vector3(pos.y, -pos.x, pos.z);
+            // sawyer
+            return new Vector3(pos.x, pos.y, pos.z);
         }
 
         private Quaternion TransformUnityToRvizRot(Quaternion quat) 
