@@ -9,17 +9,17 @@ namespace RosSharp.RosBridgeClient
     {
         public bool enableRelaxedIK;
         public List<GameObject> robotLinks;
-        public Transform gripper;
+        public List<Transform> grippers;
         public Opt xopt;
         /*public double[] posTest = new double[] { 0.015, 0.015, 0.015 };
         public double[] quatTest = new double[] { 0.0, 0.0, 0.0, 1.0 };*/
 
         private List<Joint> joints;
         private List<Quaternion> baseRotations;
-        private Vector3 gripperPos;
-        private Quaternion gripperQuat;
+        private List<Vector3> gripperPos;
+        private List<Quaternion> gripperQuat;
         // private Transform root;
-        private TransformGizmo gizmo;
+        private List<TransformGizmo> gizmos;
 
         // Start is called before the first frame update
         private void Start()
@@ -28,8 +28,14 @@ namespace RosSharp.RosBridgeClient
             baseRotations = new List<Quaternion>();
             // root = transform.root;
 
-            gripperPos = gripper.localPosition;
-            gripperQuat = gripper.localRotation;
+            gripperPos = new List<Vector3>();
+            gripperQuat = new List<Quaternion>();
+
+            for (int i = 0; i < grippers.Count; i++) {
+                gripperPos.Add(grippers[i].localPosition);
+                gripperQuat.Add(grippers[i].localRotation);
+            }
+            
 
             foreach (GameObject link in robotLinks)
             {
@@ -42,21 +48,31 @@ namespace RosSharp.RosBridgeClient
                 baseRotations.Add(link.transform.localRotation);
             }
 
-            gizmo = FindObjectOfType(typeof(TransformGizmo)) as TransformGizmo;
+            gizmos = new List<TransformGizmo>(FindObjectsOfType(typeof(TransformGizmo)) as TransformGizmo[]);
         }
 
         private unsafe void Update()
         {
             if (enableRelaxedIK) 
             {
-                gizmo.enabled = true;
-                gripperPos += TransformUnityToRvizPos(gripper.localPosition);
-                gripperQuat *= TransformUnityToRvizRot(gripper.localRotation);
-                
-                // Debug.Log(gripperPos);
-                // Debug.Log(gripperQuat);
-                double[] posArr = new double[] { gripperPos.x, gripperPos.y, gripperPos.z };
-                double[] quatArr = new double[] { gripperQuat.x, gripperQuat.y, gripperQuat.z, gripperQuat.w };
+                foreach (TransformGizmo gizmo in gizmos)
+                    gizmo.enabled = true;
+                double[] posArr = new double[3 * grippers.Count];
+                double[] quatArr = new double[4 * grippers.Count];
+                for (int i = 0; i < grippers.Count; i++) {
+                    gripperPos[i] += TransformUnityToRvizPos(grippers[i].localPosition);
+                    gripperQuat[i] *= TransformUnityToRvizRot(grippers[i].localRotation);
+                    posArr[3 * i] = gripperPos[i].x;
+                    posArr[3 * i + 1] = gripperPos[i].y;
+                    posArr[3 * i + 2] = gripperPos[i].z;
+                    quatArr[4 * i] = gripperQuat[i].x;
+                    quatArr[4 * i + 1] = gripperQuat[i].y;
+                    quatArr[4 * i + 2] = gripperQuat[i].z;
+                    quatArr[4 * i + 3] = gripperQuat[i].w;
+
+                    // Debug.Log(gripperPos[i]);
+                    // Debug.Log(gripperQuat[i]);
+                }
                 
                 xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
                 
@@ -70,10 +86,13 @@ namespace RosSharp.RosBridgeClient
                 }
                 Debug.Log("Relaxed IK: " + jaStr + "]");
 
-                gripper.localPosition = new Vector3(0, 0, 0);
-                gripper.localRotation = new Quaternion(0, 0, 0, 1);
+                foreach (Transform gripper in grippers) {
+                    gripper.localPosition = new Vector3(0, 0, 0);
+                    gripper.localRotation = new Quaternion(0, 0, 0, 1);
+                }
             } else {
-                gizmo.enabled = false;
+                foreach (TransformGizmo gizmo in gizmos)
+                    gizmo.enabled = false;
             }
         }
 
@@ -84,14 +103,18 @@ namespace RosSharp.RosBridgeClient
             // return new Vector3(pos.z, -pos.y, pos.x);
             // iiwa7
             // return new Vector3(pos.y, -pos.x, pos.z);
-            // sawyer
+            // sawyer ?
             return new Vector3(pos.x, pos.y, pos.z);
         }
 
         private Quaternion TransformUnityToRvizRot(Quaternion quat) 
         {
+            // ur5
             // return new Quaternion(quat.z, -quat.y, quat.x, quat.w);
-            return new Quaternion(quat.y, -quat.x, quat.z, quat.w);
+            // iiwa7
+            // return new Quaternion(quat.y, -quat.x, quat.z, quat.w);
+            // sawyer ?
+            return new Quaternion(quat.x, quat.y, quat.z, quat.w);
         }
     }
 

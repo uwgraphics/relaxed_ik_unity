@@ -21,3 +21,5 @@ This is the Unity wrapper of Relaxed IK.
 ## Known Issues
 1. In order to transform the orginal coordinate system in rviz to fit inside Unity, I write some hard code in RelaxedIKUnity.cs.
 2. When the end effector is dragged to some point that the robot arm cannot reach (e.g. not long enough), EEPoseGoals go out of the range.
+3. For the sawyer robot arm, dragging the gripper in the x (or y) axis will lead to changes in the y (or x) coordinate of the pose goal.
+4. GUI doesn't look right when the robot arm has many links.
