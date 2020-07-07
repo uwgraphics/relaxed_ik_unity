@@ -11,8 +11,8 @@ namespace RosSharp.RosBridgeClient
         public List<GameObject> robotLinks;
         public List<Transform> grippers;
         public Opt xopt;
-        /*public double[] posTest = new double[] { 0.015, 0.015, 0.015 };
-        public double[] quatTest = new double[] { 0.0, 0.0, 0.0, 1.0 };*/
+        // public double[] posTest = new double[] { 0.015, 0.015, 0.015 };
+        // public double[] quatTest = new double[] { 0.0, 0.0, 0.0, 1.0 };
 
         private List<Joint> joints;
         private List<Quaternion> baseRotations;

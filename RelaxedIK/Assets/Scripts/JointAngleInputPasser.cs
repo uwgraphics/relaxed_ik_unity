@@ -8,6 +8,8 @@ namespace RosSharp.RosBridgeClient
     public class InputPasser
     {
         public GameObject link;
+        public string type;
+        public Vector3 basePos;
         public Quaternion baseRot;
         public Slider slider;
         public Text text;
@@ -18,6 +20,7 @@ namespace RosSharp.RosBridgeClient
     {
         public GameObject hGroupPrefab;
         public GameObject vGroupPrefab;
+        public GameObject sliderGroupPrefab;
         public GameObject labelPrefab;
         public GameObject sliderPrefab;
         public GameObject buttonPrefab;
@@ -55,14 +58,23 @@ namespace RosSharp.RosBridgeClient
                 }
             );
 
+            for (int i = 0; i < r.grippers.Count; i++) {
+                GameObject sliderGroup = Instantiate(sliderGroupPrefab, contentPanel.Find("Sliders")) as GameObject;
+                sliderGroup.name = "slider_group_" + i;
+            }
+
             for (int i = 0; i < r.robotLinks.Count; i++)
             {
                 GameObject link = r.robotLinks[i];
                 InputPasser passer = new InputPasser();
                 passer.link = link;
+                passer.basePos = link.transform.localPosition;
                 passer.baseRot = link.transform.localRotation;
 
-                GameObject vGroup = Instantiate(vGroupPrefab, contentPanel.Find("Sliders")) as GameObject;
+                int groupIndex = i / (r.robotLinks.Count / r.grippers.Count);
+                Transform targetGroup = contentPanel.Find("Sliders").Find("slider_group_" + groupIndex.ToString());
+
+                GameObject vGroup = Instantiate(vGroupPrefab, targetGroup) as GameObject;
                 vGroup.name = "vertical_group_" + i;
 
                 GameObject hGroup = Instantiate(hGroupPrefab, vGroup.transform) as GameObject;
@@ -75,16 +87,29 @@ namespace RosSharp.RosBridgeClient
                 sliderObj.name = "slider_" + i;
                 passer.slider = sliderObj.GetComponent<Slider>();
 
-                HingeJointLimitsManager jointManager = link.GetComponent<HingeJointLimitsManager>();
-                passer.slider.value = jointManager.AngleActual * Mathf.Deg2Rad;
-                passer.slider.maxValue = jointManager.LargeAngleLimitMax * Mathf.Deg2Rad;
-                passer.slider.minValue = jointManager.LargeAngleLimitMin * Mathf.Deg2Rad;
+                HingeJointLimitsManager rJointManager = link.GetComponent<HingeJointLimitsManager>();
+                if (rJointManager) {
+                    passer.type = "revolute";
+                    passer.slider.value = rJointManager.AngleActual * Mathf.Deg2Rad;
+                    passer.slider.maxValue = rJointManager.LargeAngleLimitMax * Mathf.Deg2Rad;
+                    passer.slider.minValue = rJointManager.LargeAngleLimitMin * Mathf.Deg2Rad;
+                } else {
+                    PrismaticJointLimitsManager pJointManager = link.GetComponent<PrismaticJointLimitsManager>();
+                    if (pJointManager) {
+                        passer.type = "prismatic";
+                        passer.slider.maxValue = pJointManager.PositionLimitMax;
+                        passer.slider.minValue = pJointManager.PositionLimitMin;
+                    } else {
+                        passer.type = "unknown";
+                    }
+                }
+                
                 passer.slider.onValueChanged.AddListener(delegate {passer.updated = true;});
 
                 GameObject labelObj = Instantiate(labelPrefab, hGroup.transform) as GameObject;
                 labelObj.name = "label_" + i;
                 passer.text = labelObj.GetComponent<Text>();
-                passer.text.text = passer.slider.value.ToString("0.0");
+                passer.text.text = passer.slider.value.ToString("0.00");
 
                 passers.Add(passer);
             }
@@ -114,7 +139,7 @@ namespace RosSharp.RosBridgeClient
                 }
                 jaStr += i == 0 ? "[" + passers[i].slider.value.ToString() : ", " + passers[i].slider.value.ToString();  
             }
-            Debug.Log("Joint Angle Writer: " + jaStr + "]");
+            // Debug.Log("Joint Angle Writer: " + jaStr + "]");
 
             if (randomized) {
                 foreach (InputPasser passer in passers) 
@@ -136,10 +161,15 @@ namespace RosSharp.RosBridgeClient
         }
 
         private void UpdateJointAngle(InputPasser passer) {
-            passer.text.text = passer.slider.value.ToString("0.0");
-            float angle = Mathf.Rad2Deg * passer.slider.value;
-            Vector3 axis = angle * passer.link.GetComponent<Joint>().axis;
-            passer.link.transform.localEulerAngles = (passer.baseRot * Quaternion.Euler(axis)).eulerAngles;
+            passer.text.text = passer.slider.value.ToString("0.00");
+            if (passer.type == "revolute") {
+                float angle = Mathf.Rad2Deg * passer.slider.value;
+                Vector3 axis = angle * passer.link.GetComponent<Joint>().axis;
+                passer.link.transform.localEulerAngles = (passer.baseRot * Quaternion.Euler(axis)).eulerAngles;
+            } else if (passer.type == "prismatic") {
+                Vector3 axis = passer.slider.value * passer.link.GetComponent<ConfigurableJoint>().axis;
+                passer.link.transform.localPosition = passer.basePos + axis;
+            }
         }
 
         private void EnableRIKListener() {

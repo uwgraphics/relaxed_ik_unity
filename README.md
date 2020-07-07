@@ -9,8 +9,9 @@ This is the Unity wrapper of Relaxed IK.
 
 ## Steps of setting up a robot arm
 1. Generate config files for the robot arm with relaxed_ik_config
-   + One caveat: start configs in the info file should be floats (e.g., 0.0), otherwise Unity might crash
+   + start configs in the info file should be floats (e.g., 0.0), otherwise Unity might crash
 2. Follow the steps at [ros-sharp wiki](https://github.com/siemens/ros-sharp/wiki/User_App_NoROS_ImportURDFOnWindows) to set up the simulation of the robot arm
+   + Please make sure that the urdf file has inertia information in it, otherwise the joints may not be set up correctly 
 3. Once the robot arm is loaded, add the RelaxedIKUnity script to it. Set up the list of robot Limbs by dragging each link game object to the list
 4. On the component of the UrdfRobot script, enable Is Kinematic and All Convex Colliders and disable Use Gravity and Use Inertia from URDF
 5. Add a simple gripper by clicking Add Visual in the child called Visuals of the end effector game object. Add a Rigidbody and a collider component to the gripper. Enable Is Kinematic and disable Use Gravity in its Rigidbody component. (Alternative method: Drag and drop the Gripper prefab, be careful that the object structure should be `ee_name/Visuals/unnamed/Gripper`)
@@ -22,4 +23,5 @@ This is the Unity wrapper of Relaxed IK.
 1. In order to transform the orginal coordinate system in rviz to fit inside Unity, I write some hard code in RelaxedIKUnity.cs.
 2. When the end effector is dragged to some point that the robot arm cannot reach (e.g. not long enough), EEPoseGoals go out of the range.
 3. For the sawyer robot arm, dragging the gripper in the x (or y) axis will lead to changes in the y (or x) coordinate of the pose goal.
-4. GUI doesn't look right when the robot arm has many links.
+4. For yumi and panda, relaxed IK doesn't run very smoothly, might be the problem of their config files
+5. When switching between robot arms, it is required to change the content of load_robot manually.
