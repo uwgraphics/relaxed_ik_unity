@@ -11,10 +11,10 @@ public unsafe struct Opt
     public int length;
 }
 
-[PluginAttr("relaxed_ik")]
+[PluginAttr("relaxed_ik_lib")]
 public static class RelaxedIKLoader
 {
-    /*[DllImport("relaxed_ik")]
+    /*[DllImport("relaxed_ik_lib")]
     private static extern Opt run_solver(double[] pos_arr, int pos_length, double[] quat_arr, int quat_length);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

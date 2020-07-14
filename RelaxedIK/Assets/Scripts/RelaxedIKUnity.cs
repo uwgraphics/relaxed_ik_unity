@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using RuntimeGizmos;
 
@@ -24,6 +25,11 @@ namespace RosSharp.RosBridgeClient
         // Start is called before the first frame update
         private void Start()
         {
+            string[] paths = {Directory.GetCurrentDirectory(), "..", "relaxed_ik_core", "config", "loaded_robot"};
+            string fullPath = Path.Combine(paths);
+            // Debug.Log(fullPath);
+            File.WriteAllText(fullPath, name + "_info.yaml");
+
             joints = new List<Joint>();
             baseRotations = new List<Quaternion>();
             // root = transform.root;
@@ -117,63 +123,4 @@ namespace RosSharp.RosBridgeClient
             return new Quaternion(quat.x, quat.y, quat.z, quat.w);
         }
     }
-
-    // [CustomEditor(typeof(JointAnglesUnity))]
-    // [CanEditMultipleObjects]
-    // public class JointAnglesUnityEditor : Editor
-    // {
-    //     SerializedProperty JointAnglesSubscriber;
-    //     SerializedProperty isRadians;
-    //     SerializedProperty usingRelaxedIKAngles;
-    //     SerializedProperty robotLimbs;
-    //     SerializedProperty angles;
-    //     SerializedProperty joints;
-    //     bool showJoints =  false;
-
-    //     void OnEnable(){
-    //         JointAnglesSubscriber = serializedObject.FindProperty("sub");
-    //         usingRelaxedIKAngles = serializedObject.FindProperty("usingRelaxedIKAngles");
-    //         isRadians = serializedObject.FindProperty("isRadians");
-    //         robotLimbs = serializedObject.FindProperty("robotLimbs");
-    //         angles = serializedObject.FindProperty("angles");
-    //         joints = serializedObject.FindProperty("joints");
-    //     }
-
-    //     public override void OnInspectorGUI(){
-    //         serializedObject.UpdateIfRequiredOrScript();
-    //         EditorGUILayout.PropertyField(JointAnglesSubscriber, new GUIContent("Joint Angles Subscriber"));
-
-    //         EditorGUILayout.Space();
-
-    //         EditorGUILayout.PropertyField(robotLimbs, true);
-
-    //         EditorGUILayout.Space();
-
-    //         EditorGUILayout.PropertyField(usingRelaxedIKAngles);
-
-    //         //Hide manual angles and is radians if using relaxedIk angles
-    //         if (!usingRelaxedIKAngles.boolValue)
-    //         {
-    //             EditorGUI.indentLevel++;
-    //             EditorGUILayout.PropertyField(isRadians);
-    //             EditorGUILayout.PropertyField(angles, true);
-    //             EditorGUI.indentLevel--;
-    //         }
-
-    //         EditorGUILayout.Space();
-
-    //         showJoints = EditorGUILayout.Toggle("Show Joints", showJoints);
-
-    //         if (showJoints)
-    //         {
-    //             EditorGUI.indentLevel++;
-    //             GUI.enabled = false;
-    //             EditorGUILayout.PropertyField(joints, true);
-    //             GUI.enabled = true;
-    //             EditorGUI.indentLevel--;
-    //         }
-
-    //         serializedObject.ApplyModifiedProperties();                     
-    //     }
-    // }
 }
