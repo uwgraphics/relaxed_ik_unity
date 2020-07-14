@@ -58,7 +58,7 @@ namespace RosSharp.RosBridgeClient
                 }
             );
 
-            for (int i = 0; i < r.grippers.Count; i++) {
+            for (int i = 0; i < r.EELinks.Count; i++) {
                 GameObject sliderGroup = Instantiate(sliderGroupPrefab, contentPanel.Find("Sliders")) as GameObject;
                 sliderGroup.name = "slider_group_" + i;
             }
@@ -71,7 +71,7 @@ namespace RosSharp.RosBridgeClient
                 passer.basePos = link.transform.localPosition;
                 passer.baseRot = link.transform.localRotation;
 
-                int groupIndex = i / (r.robotLinks.Count / r.grippers.Count);
+                int groupIndex = i / (r.robotLinks.Count / r.EELinks.Count);
                 Transform targetGroup = contentPanel.Find("Sliders").Find("slider_group_" + groupIndex.ToString());
 
                 GameObject vGroup = Instantiate(vGroupPrefab, targetGroup) as GameObject;

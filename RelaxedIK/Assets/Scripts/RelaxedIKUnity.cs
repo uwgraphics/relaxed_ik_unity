@@ -10,17 +10,15 @@ namespace RosSharp.RosBridgeClient
     {
         public bool enableRelaxedIK;
         public List<GameObject> robotLinks;
-        public List<Transform> grippers;
+        public List<Transform> EELinks;
+        public GameObject gripperPrefab;
         public Opt xopt;
-        // public double[] posTest = new double[] { 0.015, 0.015, 0.015 };
-        // public double[] quatTest = new double[] { 0.0, 0.0, 0.0, 1.0 };
 
+        private List<Transform> grippers;
         private List<Joint> joints;
         private List<Quaternion> baseRotations;
-        private List<Vector3> gripperPos;
-        private List<Quaternion> gripperQuat;
-        // private Transform root;
         private List<TransformGizmo> gizmos;
+        private bool initialized;
 
         // Start is called before the first frame update
         private void Start()
@@ -30,28 +28,20 @@ namespace RosSharp.RosBridgeClient
             // Debug.Log(fullPath);
             File.WriteAllText(fullPath, name + "_info.yaml");
 
+            grippers = new List<Transform>();
             joints = new List<Joint>();
             baseRotations = new List<Quaternion>();
-            // root = transform.root;
-
-            gripperPos = new List<Vector3>();
-            gripperQuat = new List<Quaternion>();
-
-            for (int i = 0; i < grippers.Count; i++) {
-                gripperPos.Add(grippers[i].localPosition);
-                gripperQuat.Add(grippers[i].localRotation);
-            }
-            
 
             foreach (GameObject link in robotLinks)
             {
                 Joint joint = link.GetComponent<Joint>();
-                // if (joint.axis.y == 1)
-                // {
-                //     joint.axis = new Vector3(0,-1,0);
-                // }
                 joints.Add(joint);
                 baseRotations.Add(link.transform.localRotation);
+            }
+
+            foreach (Transform EELink in EELinks) {
+                GameObject gripper = Instantiate(gripperPrefab, transform) as GameObject;
+                grippers.Add(gripper.transform);
             }
 
             gizmos = new List<TransformGizmo>(FindObjectsOfType(typeof(TransformGizmo)) as TransformGizmo[]);
@@ -66,18 +56,21 @@ namespace RosSharp.RosBridgeClient
                 double[] posArr = new double[3 * grippers.Count];
                 double[] quatArr = new double[4 * grippers.Count];
                 for (int i = 0; i < grippers.Count; i++) {
-                    gripperPos[i] += TransformUnityToRvizPos(grippers[i].localPosition);
-                    gripperQuat[i] *= TransformUnityToRvizRot(grippers[i].localRotation);
-                    posArr[3 * i] = gripperPos[i].x;
-                    posArr[3 * i + 1] = gripperPos[i].y;
-                    posArr[3 * i + 2] = gripperPos[i].z;
-                    quatArr[4 * i] = gripperQuat[i].x;
-                    quatArr[4 * i + 1] = gripperQuat[i].y;
-                    quatArr[4 * i + 2] = gripperQuat[i].z;
-                    quatArr[4 * i + 3] = gripperQuat[i].w;
+                    Transform poseGoal = grippers[i].Find("Collision");
+                    Vector3 gripperPos = TransformUnityToRviz(poseGoal.localPosition);
+                    Vector3 quatTemp = TransformUnityToRviz(new Vector3(poseGoal.localRotation.x, poseGoal.localRotation.y, poseGoal.localRotation.z));
+                    Quaternion gripperQuat = new Quaternion(quatTemp.x, quatTemp.y, quatTemp.z, poseGoal.localRotation.w);
 
-                    // Debug.Log(gripperPos[i]);
-                    // Debug.Log(gripperQuat[i]);
+                    posArr[3*i] = gripperPos.x;
+                    posArr[3*i+1] = gripperPos.y;
+                    posArr[3*i+2] = gripperPos.z;
+                    quatArr[4*i] = gripperQuat.x;
+                    quatArr[4*i+1] = gripperQuat.y;
+                    quatArr[4*i+2] = gripperQuat.z;
+                    quatArr[4*i+3] = gripperQuat.w;
+
+                    Debug.Log(gripperPos);
+                    Debug.Log(gripperQuat);
                 }
                 
                 xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
@@ -92,9 +85,12 @@ namespace RosSharp.RosBridgeClient
                 }
                 Debug.Log("Relaxed IK: " + jaStr + "]");
 
-                foreach (Transform gripper in grippers) {
-                    gripper.localPosition = new Vector3(0, 0, 0);
-                    gripper.localRotation = new Quaternion(0, 0, 0, 1);
+                if (!initialized) {
+                    initialized = true;
+                    for (int i = 0; i < grippers.Count; i++) {
+                        grippers[i].position = EELinks[i].position;
+                        grippers[i].rotation = EELinks[i].rotation;
+                    }
                 }
             } else {
                 foreach (TransformGizmo gizmo in gizmos)
@@ -103,24 +99,17 @@ namespace RosSharp.RosBridgeClient
         }
 
         // Some hard code to transform the coordinate system
-        private Vector3 TransformUnityToRvizPos(Vector3 pos)
+        private Vector3 TransformUnityToRviz(Vector3 v)
         {
-            // ur5
-            // return new Vector3(pos.z, -pos.y, pos.x);
-            // iiwa7
-            // return new Vector3(pos.y, -pos.x, pos.z);
-            // sawyer ?
-            return new Vector3(pos.x, pos.y, pos.z);
-        }
-
-        private Quaternion TransformUnityToRvizRot(Quaternion quat) 
-        {
-            // ur5
-            // return new Quaternion(quat.z, -quat.y, quat.x, quat.w);
-            // iiwa7
-            // return new Quaternion(quat.y, -quat.x, quat.z, quat.w);
-            // sawyer ?
-            return new Quaternion(quat.x, quat.y, quat.z, quat.w);
+            if (name == "ur5") {
+                return new Vector3(v.z, -v.y, v.x);
+            } else if (name == "iiwa7") {
+                return new Vector3(v.y, -v.x, v.z);
+            } else if (name == "sawyer") {
+                return new Vector3(v.x, v.y, v.z);
+            } else {
+                return new Vector3(v.x, v.y, v.z);
+            }
         }
     }
 }
