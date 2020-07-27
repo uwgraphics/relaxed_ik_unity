@@ -1,4 +1,6 @@
 # relaxed_ik_unity
+Here is the project page that has more information about RelaxedIK that you may want to know about: https://uwgraphics.github.io/relaxed_ik_core/
+
 This is the Unity wrapper of RelaxedIK designed to be run on Windows. Note that it probably won’t work on a linux machine. The simulation of a few commonly used robot arms have already been set up for you to play with. You will be able to disable and enable RelaxedIK as you like. When RelaxedIK is disabled, a joint angle writer panel will show up for you to modify the joint angle configuration. When RelaxedIK is enabled, you will be able to have real-time interactions with the robot and RelaxedIK by dragging the transform gizmo associated with the gripper of the robot
 
 ## Rust Dependencies (Not optional)
