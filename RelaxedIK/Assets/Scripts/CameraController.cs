@@ -21,11 +21,15 @@ namespace RosSharp.RosBridgeClient
         // Start is called before the first frame update
         private void Start()
         {
-            Transform target = (FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity).transform.Find("ViewCenter");
+            RelaxedIKUnity r = FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity;
+            if (r.EELinks.Count > 1) {
+                transform.position = new Vector3(0, 1.2f, 1.2f);
+            }
+            Transform target = r.transform.Find("ViewCenter");
             if (target) {
                 transform.LookAt(target);
             } else {
-                transform.LookAt((FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity).transform);
+                transform.LookAt(r.transform);
             }
 
             // Initialize the correct initial rotation

@@ -91,8 +91,8 @@ namespace RosSharp.RosBridgeClient
                 if (rJointManager) {
                     passer.type = "revolute";
                     passer.slider.value = rJointManager.AngleActual * Mathf.Deg2Rad;
-                    passer.slider.maxValue = rJointManager.LargeAngleLimitMax * Mathf.Deg2Rad;
-                    passer.slider.minValue = rJointManager.LargeAngleLimitMin * Mathf.Deg2Rad;
+                    passer.slider.maxValue = rJointManager.LargeAngleLimitMin * -1.0f * Mathf.Deg2Rad;
+                    passer.slider.minValue = rJointManager.LargeAngleLimitMax * -1.0f * Mathf.Deg2Rad;
                 } else {
                     PrismaticJointLimitsManager pJointManager = link.GetComponent<PrismaticJointLimitsManager>();
                     if (pJointManager) {
