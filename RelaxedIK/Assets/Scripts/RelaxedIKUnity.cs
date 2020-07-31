@@ -35,6 +35,10 @@ namespace RosSharp.RosBridgeClient
             foreach (GameObject link in robotLinks)
             {
                 Joint joint = link.GetComponent<Joint>();
+                if (joint.axis.y == 1)
+                {
+                    joint.axis = new Vector3(0,-1,0);
+                }
                 joints.Add(joint);
                 baseRotations.Add(link.transform.localRotation);
             }
@@ -55,6 +59,8 @@ namespace RosSharp.RosBridgeClient
                     gizmo.enabled = true;
                 double[] posArr = new double[3 * grippers.Count];
                 double[] quatArr = new double[4 * grippers.Count];
+                string posStr = "Goal position: ";
+                string quatStr = "Goal rotation: ";
                 for (int i = 0; i < grippers.Count; i++) {
                     Transform poseGoal = grippers[i].Find("Collision");
                     Vector3 gripperPos = TransformUnityToRviz(poseGoal.localPosition);
@@ -69,9 +75,15 @@ namespace RosSharp.RosBridgeClient
                     quatArr[4*i+2] = gripperQuat.z;
                     quatArr[4*i+3] = gripperQuat.w;
 
-                    Debug.Log(gripperPos);
-                    Debug.Log(gripperQuat);
+                    if (i > 0) {
+                        posStr += ", ";
+                        quatStr += ", ";
+                    }
+                    posStr += gripperPos.ToString("F3");
+                    quatStr += gripperQuat.ToString("F3");
                 }
+                Debug.Log(posStr);
+                Debug.Log(quatStr);
                 
                 xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
                 
@@ -101,12 +113,18 @@ namespace RosSharp.RosBridgeClient
         // Some hard code to transform the coordinate system
         private Vector3 TransformUnityToRviz(Vector3 v)
         {
-            if (name == "ur5") {
-                return new Vector3(v.z, -v.y, v.x);
+            if (name == "baxter") {
+                return new Vector3(v.z, -v.y, -v.x);
             } else if (name == "iiwa7") {
-                return new Vector3(v.y, -v.x, v.z);
+                return new Vector3(v.y, -v.z, -v.x);
+            } else if (name == "jaco7") {
+                return new Vector3(v.y, -v.z, -v.x);
+            } else if (name == "panda") {
+                return new Vector3(v.y, -v.x, -v.z);
             } else if (name == "sawyer") {
-                return new Vector3(v.x, v.y, v.z);
+                return new Vector3(v.y, v.x, v.z);
+            } else if (name == "ur5") {
+                return new Vector3(v.z, -v.y, v.x);
             } else {
                 return new Vector3(v.x, v.y, v.z);
             }
