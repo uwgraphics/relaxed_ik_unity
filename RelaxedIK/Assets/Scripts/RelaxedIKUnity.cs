@@ -72,10 +72,10 @@ namespace RosSharp.RosBridgeClient
                     posArr[3*i] = poseGoal.localPosition.x;
                     posArr[3*i+1] = poseGoal.localPosition.y;
                     posArr[3*i+2] = poseGoal.localPosition.z;
-                    quatArr[4*i] = poseGoal.localRotation.x;
-                    quatArr[4*i+1] = poseGoal.localRotation.y;
-                    quatArr[4*i+2] = poseGoal.localRotation.z;
-                    quatArr[4*i+3] = poseGoal.localRotation.w;
+                    quatArr[4*i] = poseGoal.localRotation.w;
+                    quatArr[4*i+1] = poseGoal.localRotation.x;
+                    quatArr[4*i+2] = poseGoal.localRotation.y;
+                    quatArr[4*i+3] = poseGoal.localRotation.z;
 
                     if (i > 0) {
                         posStr += ", ";
@@ -85,10 +85,10 @@ namespace RosSharp.RosBridgeClient
                     posStr += poseGoal.localPosition.ToString("F3");
                     quatStr += poseGoal.localRotation.ToString("F3");
                 }
-                Debug.Log(posStr);
-                Debug.Log(quatStr);
+                // Debug.Log(posStr);
+                // Debug.Log(quatStr);
                 
-                xopt = RelaxedIKLoader.runUnity(posArr, posArr.Length, quatArr, quatArr.Length);
+                xopt = RelaxedIKLoader.solve(posArr, posArr.Length, quatArr, quatArr.Length);
                 
                 string jaStr = "";
                 for (int i = 0; i < xopt.length; i++)
@@ -124,13 +124,13 @@ namespace RosSharp.RosBridgeClient
             if (name == "baxter") {
                 return new Vector3(v.y, v.z, -v.x);
             } else if (name == "hubo") {
-                return new Vector3(v.x, v.y, v.z);
+                return new Vector3(v.y, v.x, -v.z);
             } else if (name == "iiwa7") {
                 return new Vector3(v.y, v.z, -v.x);
             } else if (name == "jaco7") {
                 return new Vector3(v.y, v.z, -v.x);
             } else if (name == "panda") {
-                return new Vector3(v.y, v.x, v.z);
+                return new Vector3(v.x, -v.z, -v.y);
             } else if (name == "sawyer") {
                 return new Vector3(v.y, v.x, v.z);
             } else if (name == "ur5") {

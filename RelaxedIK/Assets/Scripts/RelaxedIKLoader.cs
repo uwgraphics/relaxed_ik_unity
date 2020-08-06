@@ -14,16 +14,7 @@ public unsafe struct Opt
 [PluginAttr("relaxed_ik_lib")]
 public static class RelaxedIKLoader
 {
-    /*[DllImport("relaxed_ik_lib")]
-    private static extern Opt run_solver(double[] pos_arr, int pos_length, double[] quat_arr, int quat_length);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Opt RunSolver(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len)
-    {
-        return run_solver(pos_arr, pos_len, quat_arr, quat_len);
-    }*/
-
-    [PluginFunctionAttr("run_unity")]
-    public static RunUnity runUnity = null;
-    public delegate Opt RunUnity(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len);
+    [PluginFunctionAttr("solve")]
+    public static Solve solve = null;
+    public delegate Opt Solve(double[] pos_arr, int pos_len, double[] quat_arr, int quat_len);
 }

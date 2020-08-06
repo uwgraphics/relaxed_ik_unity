@@ -22,6 +22,7 @@ namespace RosSharp.RosBridgeClient
         private void Start()
         {
             RelaxedIKUnity r = FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity;
+            if (!r) return;
             if (r.EELinks.Count > 1) {
                 transform.position = new Vector3(0, 1.2f, 1.2f);
             }

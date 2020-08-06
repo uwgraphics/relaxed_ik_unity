@@ -36,6 +36,11 @@ namespace RosSharp.RosBridgeClient
         void Start()
         {
             r = FindObjectOfType(typeof(RelaxedIKUnity)) as RelaxedIKUnity;
+            if (!r) {
+                gameObject.SetActive(false);
+                Debug.Log("Please select one robot to play with by enabling the corresponding gameobject!");
+                return;
+            }
             contentPanel =  transform.Find("Content");
             passers = new List<InputPasser>();
 
@@ -130,6 +135,7 @@ namespace RosSharp.RosBridgeClient
         // Update is called once per frame
         void Update()
         {
+            if (!r) return;
             string jaStr = "";
             for (int i = 0; i < passers.Count; i++)
             {

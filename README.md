@@ -28,9 +28,3 @@ If you plan to extend any of the Rust code, we recommend using the Jetbrains rus
 3. Once the robot arm is loaded, add the RelaxedIKUnity script in Assets/Scripts to it. Set up the list of robot Limbs and end effectors by adding the corresponding game object to the list. The size of this list should be the same as the size of joint angle solution array published by RelaxedIK for the corresponding robot. You can refer to the corresponding xxx_info.yaml for which, how many and the order of links to add to the list. Be careful that you only want those links with the Hinge Joint component which imply that they are associated with revolute joints. You also need to drag and drop the transform(s) of the end effector(s) and the pose goal prefab (which can be found at Assets/Prefabs/PoseGoal) to the Relaxed IK Unity component.
 4. On the component of the UrdfRobot script, enable Is Kinematic and All Convex Colliders and disable Use Gravity and Use Inertia from URDF.
 5. Optional: Add a child named `ViewCenter` tot the robot arm to configure the position of the camera at runtime.
-
-## Known Issues
-1. In order to transform the orginal coordinate system in rviz to fit inside Unity, I write some hard code in RelaxedIKUnity.cs.
-2. When the end effector is dragged to some point that the robot arm cannot reach (e.g. not long enough), EEPoseGoals go out of the range.
-3. For the sawyer robot arm, dragging the gripper in the x (or y) axis will lead to changes in the y (or x) coordinate of the pose goal.
-4. For yumi and panda, relaxed IK doesn't run very smoothly, might be the problem of their config files
