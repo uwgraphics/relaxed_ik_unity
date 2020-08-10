@@ -72,10 +72,10 @@ namespace RosSharp.RosBridgeClient
                     posArr[3*i] = poseGoal.localPosition.x;
                     posArr[3*i+1] = poseGoal.localPosition.y;
                     posArr[3*i+2] = poseGoal.localPosition.z;
-                    quatArr[4*i] = poseGoal.localRotation.w;
-                    quatArr[4*i+1] = poseGoal.localRotation.x;
-                    quatArr[4*i+2] = poseGoal.localRotation.y;
-                    quatArr[4*i+3] = poseGoal.localRotation.z;
+                    quatArr[4*i] = poseGoal.localRotation.x;
+                    quatArr[4*i+1] = poseGoal.localRotation.y;
+                    quatArr[4*i+2] = poseGoal.localRotation.z;
+                    quatArr[4*i+3] = poseGoal.localRotation.w;
 
                     if (i > 0) {
                         posStr += ", ";
