@@ -65,8 +65,8 @@ namespace RosSharp.RosBridgeClient
                 for (int i = 0; i < grippers.Count; i++) {
                     Transform gripper = grippers[i];
                     Transform poseGoal = grippers[i].Find("PoseGoal");
-                    poseGoal.Translate(TransformUnityToRviz(gripper.localPosition));
-                    Vector3 quatTemp = TransformUnityToRviz(new Vector3(gripper.localRotation.x, gripper.localRotation.y, gripper.localRotation.z));
+                    poseGoal.Translate(TransformUnityToRviz(i, gripper.localPosition));
+                    Vector3 quatTemp = TransformUnityToRviz(i, new Vector3(gripper.localRotation.x, gripper.localRotation.y, gripper.localRotation.z));
                     poseGoal.localRotation *= new Quaternion(quatTemp.x, quatTemp.y, quatTemp.z, gripper.localRotation.w);
 
                     posArr[3*i] = poseGoal.localPosition.x;
@@ -119,10 +119,14 @@ namespace RosSharp.RosBridgeClient
         }
 
         // Some hard code to transform the coordinate system
-        private Vector3 TransformUnityToRviz(Vector3 v)
+        private Vector3 TransformUnityToRviz(int idx, Vector3 v)
         {
             if (name == "baxter") {
-                return new Vector3(v.y, v.z, -v.x);
+                if (idx == 0) {
+                    return new Vector3(v.y, v.z, -v.x);
+                } else {
+                    return new Vector3(v.y, -v.z, v.x);
+                }
             } else if (name == "hubo") {
                 return new Vector3(v.y, v.x, -v.z);
             } else if (name == "iiwa7") {
@@ -136,7 +140,11 @@ namespace RosSharp.RosBridgeClient
             } else if (name == "ur5") {
                 return new Vector3(-v.z, -v.y, v.x);
             } else if (name == "yumi") {
-                return new Vector3(v.x, v.y, v.z);
+                if (idx == 0) {
+                    return new Vector3(v.y, v.z, -v.x);
+                } else {
+                    return new Vector3(v.y, -v.z, v.x);
+                }
             } else {
                 return new Vector3(v.x, v.y, v.z);
             }
